@@ -1,4 +1,4 @@
-package br.com.casadocodigo.service;
+package br.com.casadocodigo.service.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,10 +28,11 @@ import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 
 import br.com.casadocodigo.modelo.Cerveja;
+import br.com.casadocodigo.modelo.CervejaJaExisteException;
 import br.com.casadocodigo.modelo.Cervejas;
 import br.com.casadocodigo.modelo.Estoque;
 
-@WebServlet(value = "/cervejas/*")
+//@WebServlet(value = "/cervejas/*")
 public class CervejaServlet extends HttpServlet {
 
 	private Estoque estoque = new Estoque();
@@ -84,13 +85,13 @@ public class CervejaServlet extends HttpServlet {
 			}
 
 			
-		} catch (JAXBException | JSONException | XMLStreamException e) {
+		} catch (JAXBException | JSONException | XMLStreamException | CervejaJaExisteException e) {
 			resp.sendError(500, e.getMessage());
 		}
 	}
 
 	private void escreveObjetoJSON(HttpServletRequest req, HttpServletResponse resp, String identificador)
-			throws IOException, JSONException, XMLStreamException, JAXBException {
+			throws IOException, JSONException, XMLStreamException, JAXBException, CervejaJaExisteException {
 		List<String> lines = IOUtils.readLines(req.getInputStream());
 		StringBuilder builder = new StringBuilder();
 		for (String line : lines) {
@@ -103,7 +104,7 @@ public class CervejaServlet extends HttpServlet {
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		Cerveja cerveja = (Cerveja) unmarshaller.unmarshal(xmlStreamReader);
 		cerveja.setNome(identificador);
-		estoque.adicionarCervejas(cerveja);
+		estoque.adicionarCerveja(cerveja);
 		System.out.println(cerveja);
 		String requestURI = req.getRequestURI();
 		resp.setHeader("Location", requestURI);
@@ -112,11 +113,11 @@ public class CervejaServlet extends HttpServlet {
 	}
 
 	private void escreveObjetoXML(HttpServletRequest req, HttpServletResponse resp, String identificador)
-			throws JAXBException, IOException {
+			throws JAXBException, IOException, CervejaJaExisteException {
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		Cerveja cerveja = (Cerveja) unmarshaller.unmarshal(req.getInputStream());
 		cerveja.setNome(identificador);
-		estoque.adicionarCervejas(cerveja);
+		estoque.adicionarCerveja(cerveja);
 		System.out.println(cerveja);
 		String requestURI = req.getRequestURI();
 		resp.setHeader("Location", requestURI);

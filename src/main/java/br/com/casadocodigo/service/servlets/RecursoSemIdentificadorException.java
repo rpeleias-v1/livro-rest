@@ -1,4 +1,4 @@
-package br.com.casadocodigo.service;
+package br.com.casadocodigo.service.servlets;
 
 public class RecursoSemIdentificadorException extends Exception {
 

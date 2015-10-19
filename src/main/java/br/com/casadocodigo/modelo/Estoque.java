@@ -3,6 +3,7 @@ package br.com.casadocodigo.modelo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Estoque {
@@ -16,15 +17,50 @@ public class Estoque {
 		this.cervejas.put(erdinger.getNome(), erdinger);
 	}
 	
-	public Collection<Cerveja> listarCervejas() {
+	public List<Cerveja> listarCervejas() {
 		return new ArrayList<Cerveja>(this.cervejas.values());
 	}
 	
-	public void adicionarCervejas(Cerveja cerveja) {
+	public List<Cerveja> listarCervejas(int numeroPagina, int tamanhoPagina) {
+		int indiceInicial = numeroPagina * tamanhoPagina;
+		int indiceFinal = indiceInicial + tamanhoPagina;
+		
+		List<Cerveja> cervejas = listarCervejas();
+		
+		if (cervejas.size() > indiceInicial) {
+			if (cervejas.size() > indiceFinal) {
+				cervejas = cervejas.subList(indiceInicial, indiceFinal);
+			} else {
+				cervejas = cervejas.subList(indiceInicial, cervejas.size());
+			}
+		} else {
+			cervejas = new ArrayList<>();
+		}
+		return cervejas;
+	}
+	
+	public void adicionarCerveja(Cerveja cerveja) throws CervejaJaExisteException {
+		if (this.cervejas.containsKey(cerveja.getNome())) {
+			throw new CervejaJaExisteException();
+		}
 		this.cervejas.put(cerveja.getNome(), cerveja);
 	}
 	
 	public Cerveja recuperarCervejaPeloNome(String nome) {
 		return this.cervejas.get(nome);
+	}
+	
+	public void atualizarCerveja(Cerveja cerveja) {
+		if (this.cervejas.containsKey(cerveja.getNome())) {
+			throw new CervejaNaoEncontradaException();
+		}
+		cervejas.put(cerveja.getNome(), cerveja);
+	}
+
+	public void apagarCerveja(String cerveja) {
+		if (!this.cervejas.containsKey(cerveja)) {
+			throw new CervejaNaoEncontradaException();
+		}
+		cervejas.remove(cerveja);
 	}
 }
